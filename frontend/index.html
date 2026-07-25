@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zepto Reviews AI — Customer Behavioral Discovery & Category Adoption Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0d0f17; color: #f3f4f6; }
+        .glass-card { background: rgba(22, 27, 46, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .purple-gradient { background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); }
+        .emerald-gradient { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+        .rose-gradient { background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); }
+        .amber-gradient { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
+        .blue-gradient { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); }
+        .zepto-badge { background-color: rgba(147, 51, 234, 0.15); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.3); }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+    <!-- Top Navigation Header -->
+    <header class="border-b border-gray-800 bg-gray-950/80 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl purple-gradient flex items-center justify-center font-bold text-white shadow-lg shadow-purple-500/20">
+                    Z
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white flex items-center gap-2">
+                        Zepto Reviews AI 
+                        <span class="zepto-badge text-xs px-2.5 py-0.5 rounded-full font-medium">Behavioral Discovery Engine</span>
+                    </h1>
+                    <p class="text-xs text-gray-400">Customer Category Switching & Order Repetition Pattern Discovery (`com.zepto.customer`)</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2.5">
+                <button onclick="loadDiscoveryInsights()" class="purple-gradient hover:opacity-90 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-md shadow-purple-600/20">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Refresh Behavioral Discovery
+                </button>
+                <button onclick="downloadCSVReport()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700">
+                    Export Reviews CSV
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 mt-8 space-y-8">
+        <!-- Executive Category Adoption KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+            <div class="glass-card p-5 rounded-2xl border-l-4 border-l-purple-500">
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Repetitive Core Grocery Orders</p>
+                <h3 id="kpiCoreRepetition" class="text-3xl font-extrabold text-purple-400 mt-2">81.4%</h3>
+                <p class="text-xs text-gray-500 mt-1">Milk, Veggies, Daily Essentials Lock-in</p>
+            </div>
+            <div class="glass-card p-5 rounded-2xl border-l-4 border-l-rose-500">
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Non-Core Category Adoption</p>
+                <h3 id="kpiNonCoreAdoption" class="text-3xl font-extrabold text-rose-400 mt-2">18.6%</h3>
+                <p class="text-xs text-gray-500 mt-1">Electronics, Beauty, Cafe, Meat Adoption</p>
+            </div>
+            <div class="glass-card p-5 rounded-2xl border-l-4 border-l-amber-500">
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Top Switching Barrier</p>
+                <h3 id="kpiTopBarrier" class="text-2xl font-extrabold text-amber-400 mt-2">Spoilage Anxiety</h3>
+                <p class="text-xs text-gray-500 mt-1">Fear of defective/fake items</p>
+            </div>
+            <div class="glass-card p-5 rounded-2xl border-l-4 border-l-emerald-500">
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Reviews Analyzed</p>
+                <h3 id="kpiTotalAnalyzed" class="text-3xl font-extrabold text-white mt-2">5,000</h3>
+                <p class="text-xs text-gray-500 mt-1">PII-Sanitized Customer Reviews</p>
+            </div>
+        </div>
+
+        <!-- 8 Core Customer Behavioral Discovery Questions Section -->
+        <div class="glass-card p-6 rounded-2xl space-y-5 border-l-4 border-l-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        💡 Customer Behavioral Discovery Engine (8 Key Strategic Questions)
+                    </h2>
+                    <p class="text-xs text-gray-400">Data-backed answers extracted from 5,000 normalized customer discussions</p>
+                </div>
+                <span class="text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full font-mono font-semibold">8 Questions Answered</span>
+            </div>
+
+            <div id="behavioralDiscoveryGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="col-span-2 text-center text-xs text-gray-400 py-6">Loading behavioral discovery matrix...</div>
+            </div>
+        </div>
+
+        <!-- Customer Category Switching Friction Breakdown Section -->
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        🔍 Category Switching Barriers Distribution
+                    </h2>
+                    <p class="text-xs text-gray-400">Distribution of customer friction points preventing cross-category adoption</p>
+                </div>
+            </div>
+
+            <div id="frictionCardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-gray-900/80 p-5 rounded-xl border border-gray-800 text-xs text-gray-400 text-center col-span-3">
+                    Loading category friction patterns...
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategic Recommendations for Zepto Product & Growth Teams -->
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+                💡 Strategic Growth Levers to Drive Category Switching
+            </h2>
+            <div id="recommendationsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Category-Wise Performance Analytics Matrix Table -->
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-white">Product Category Adoption Breakdown Matrix</h2>
+                    <p class="text-xs text-gray-400">Review volume, average star rating, and customer dissatisfaction rate per category</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-gray-900/80 text-gray-400 uppercase font-semibold border-b border-gray-800">
+                        <tr>
+                            <th class="p-3">Product Category</th>
+                            <th class="p-3">Review Volume</th>
+                            <th class="p-3">Share of Orders (%)</th>
+                            <th class="p-3">Average Star Rating</th>
+                            <th class="p-3">Dissatisfaction Rate (%)</th>
+                            <th class="p-3">Category Classification</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryMatrixBody" class="divide-y divide-gray-800/60">
+                        <tr>
+                            <td colspan="6" class="p-4 text-center text-gray-500">Loading category breakdown...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Ingested Play Store Reviews List -->
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-white">Ingested Customer Reviews Corpus</h2>
+                    <p class="text-xs text-gray-400">Normalized, PII-sanitized customer review texts for deep qualitative analysis</p>
+                </div>
+                <button onclick="loadReviews()" class="text-xs text-purple-400 hover:text-purple-300 font-medium">Refresh List</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-gray-900/80 text-gray-400 uppercase font-semibold border-b border-gray-800">
+                        <tr>
+                            <th class="p-3">Rating</th>
+                            <th class="p-3">Aspect Category</th>
+                            <th class="p-3">Normalized Customer Review Text</th>
+                            <th class="p-3">App Release Version</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewsTableBody" class="divide-y divide-gray-800/60">
+                        <tr>
+                            <td colspan="4" class="p-6 text-center text-gray-500">Loading customer reviews...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+
+        async function loadDiscoveryInsights() {
+            try {
+                const res = await fetch(`${API_BASE}/discovery/behavioral-insights`);
+                const data = await res.json();
+
+                const grid = document.getElementById('behavioralDiscoveryGrid');
+                if (!data.behavioral_insights || data.behavioral_insights.length === 0) {
+                    grid.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-500">No behavioral insights found.</div>`;
+                    return;
+                }
+
+                grid.innerHTML = data.behavioral_insights.map((q, idx) => {
+                    return `
+                        <div class="bg-gray-900/90 p-5 rounded-xl border border-gray-800 space-y-3 hover:border-blue-500/50 transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] font-mono font-bold px-2.5 py-0.5 rounded">Q${idx + 1} • ${q.category_focus}</span>
+                                <span class="text-purple-400 font-mono font-bold text-xs">${q.primary_metric}</span>
+                            </div>
+                            <h3 class="text-sm font-bold text-white">${q.question}</h3>
+                            <p class="text-xs text-gray-300 leading-relaxed"><strong class="text-gray-200">Key Finding:</strong> ${q.key_finding}</p>
+                            <div class="bg-gray-950 p-3 rounded-lg border border-gray-800 text-[11px] space-y-1">
+                                <span class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Customer Discussion Quote:</span>
+                                <p class="italic text-gray-400">"${q.evidence_snippets[0] || 'Customer feedback noted'}"</p>
+                            </div>
+                            <div class="pt-1">
+                                <span class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block mb-0.5">Strategic Action:</span>
+                                <p class="text-[11px] text-emerald-300 font-medium">${q.strategic_recommendation}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error("Failed to load discovery insights:", err);
+            }
+        }
+
+        async function loadFrictionAnalysis() {
+            try {
+                const res = await fetch(`${API_BASE}/category-adoption/friction-analysis`);
+                const data = await res.json();
+
+                document.getElementById('kpiCoreRepetition').innerText = `${data.core_grocery_repetition_pct}%`;
+                document.getElementById('kpiNonCoreAdoption').innerText = `${data.non_core_category_adoption_pct}%`;
+                document.getElementById('kpiTotalAnalyzed').innerText = data.total_reviews_analyzed.toLocaleString();
+
+                if (data.category_switching_friction_barriers && data.category_switching_friction_barriers.length > 0) {
+                    document.getElementById('kpiTopBarrier').innerText = data.category_switching_friction_barriers[0].friction_type;
+                }
+
+                // Render Friction Cards
+                const frictionContainer = document.getElementById('frictionCardsContainer');
+                frictionContainer.innerHTML = data.category_switching_friction_barriers.map(f => {
+                    return `
+                        <div class="bg-gray-900/90 p-5 rounded-xl border border-gray-800 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-bold text-white text-xs">${f.friction_type}</h4>
+                                <span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded font-mono font-bold text-[11px]">${f.percentage}%</span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 font-mono">Mentions: ${f.count} customer reviews</p>
+                            <div class="bg-gray-950 p-3 rounded-lg border border-gray-800 text-[11px] text-gray-300 space-y-1">
+                                <span class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Customer Review Snippet:</span>
+                                <p class="italic text-gray-300">"${f.sample_snippets[0] || 'Quality concerns mentioned'}"</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Render Strategic Recommendations
+                const recContainer = document.getElementById('recommendationsContainer');
+                recContainer.innerHTML = data.strategic_growth_recommendations.map(r => {
+                    return `
+                        <div class="bg-gray-900/90 p-5 rounded-xl border border-purple-500/30 space-y-2">
+                            <span class="bg-purple-500/20 text-purple-300 text-[10px] font-semibold px-2.5 py-0.5 rounded-full border border-purple-500/30">${r.target_category}</span>
+                            <h4 class="font-bold text-white text-xs mt-1">${r.pillar}</h4>
+                            <p class="text-xs text-gray-300">${r.action}</p>
+                        </div>
+                    `;
+                }).join('');
+
+                // Render Category Breakdown Matrix
+                const matrixBody = document.getElementById('categoryMatrixBody');
+                matrixBody.innerHTML = data.category_breakdown.map(c => {
+                    const classBadge = c.is_non_core
+                        ? `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-bold">NON-CORE CATEGORY</span>`
+                        : `<span class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded text-[10px] font-bold">CORE REPETITIVE GROCERY</span>`;
+
+                    return `
+                        <tr class="hover:bg-gray-900/40 transition-colors">
+                            <td class="p-3 font-bold text-white">${c.category_name}</td>
+                            <td class="p-3 text-gray-300 font-medium">${c.review_count}</td>
+                            <td class="p-3 text-purple-400 font-bold font-mono">${c.percentage_of_total}%</td>
+                            <td class="p-3 text-amber-400 font-bold">${c.average_rating} ★</td>
+                            <td class="p-3 text-rose-400 font-bold font-mono">${c.dissatisfaction_rate}%</td>
+                            <td class="p-3">${classBadge}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error("Failed to load category friction analysis:", err);
+            }
+        }
+
+        function downloadCSVReport() {
+            window.location.href = `${API_BASE}/export/reviews.csv`;
+        }
+
+        async function loadReviews() {
+            try {
+                const res = await fetch(`${API_BASE}/reviews?page=1&page_size=20`);
+                const data = await res.json();
+                const tbody = document.getElementById('reviewsTableBody');
+
+                if (!data.reviews || data.reviews.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-500">No reviews found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.reviews.map(r => {
+                    const stars = '★'.repeat(r.rating_stars) + '☆'.repeat(5 - r.rating_stars);
+                    const starColor = r.rating_stars <= 2 ? 'text-red-400' : (r.rating_stars === 3 ? 'text-amber-400' : 'text-emerald-400');
+
+                    return `
+                        <tr class="hover:bg-gray-900/40 transition-colors">
+                            <td class="p-3 font-bold ${starColor} whitespace-nowrap">${stars} (${r.rating_stars})</td>
+                            <td class="p-3 whitespace-nowrap"><span class="bg-gray-800 text-purple-300 border border-gray-700 px-2 py-0.5 rounded text-[11px] font-medium">${r.primary_aspect}</span></td>
+                            <td class="p-3 text-gray-300 max-w-lg">${r.sanitized_text}</td>
+                            <td class="p-3 text-purple-400 font-mono whitespace-nowrap">${r.app_version || 'v4.12.0'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error("Failed to load reviews:", err);
+            }
+        }
+
+        // Initialize on load
+        loadDiscoveryInsights();
+        loadFrictionAnalysis();
+        loadReviews();
+    </script>
+</body>
+</html>

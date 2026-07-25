@@ -1,0 +1,9 @@
+Active Build Scope: Google Play Store Reviews for Zepto (Phase 1 Focus)
+
+Refer to the updated markdown problem statement document:
+[ProblemStatement.md](file:///c:/Users/DELL/OneDrive/Desktop/Krishna/Zepto%20Reviews%20AI/Docs/ProblemStatement.md)
+
+Title: Zepto Reviews AI — Problem Statement & Solution Architecture (Play Store Focus)
+Domain: Quick Commerce (Q-Commerce) / E-Commerce / AI Analytics & NLP
+Target Organization: Zepto
+Status: Approved for Implementation (Play Store MVP Scope)
