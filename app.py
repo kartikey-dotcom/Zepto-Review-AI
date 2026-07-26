@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+from backend.review_qa_engine import ReviewQAEngine
 
 # Page Configuration
 st.set_page_config(
@@ -144,7 +145,52 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Sidebar Data Controls
+# Sidebar Data Controls & AI Chatbot
+st.sidebar.markdown("### 🤖 Customer Review AI Assistant")
+st.sidebar.caption("Ask any question about customer reviews, complaints, delivery, or category switching friction.")
+
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = [
+        {
+            "role": "assistant",
+            "content": "Hello! I am your Zepto Review Assistant. Ask me anything about customer feedback, top complaints, return friction, or delivery speed!"
+        }
+    ]
+
+# Quick suggestion chips
+st.sidebar.markdown("**Quick Sample Questions:**")
+q_cols1, q_cols2 = st.sidebar.columns(2)
+selected_prompt = None
+
+if q_cols1.button("⚡ Delivery", key="btn_deliv"):
+    selected_prompt = "What are the top delivery and speed complaints?"
+if q_cols2.button("📦 Electronics", key="btn_elec"):
+    selected_prompt = "Why do users hesitate to buy electronics?"
+if q_cols1.button("🥛 Milk Leak", key="btn_milk"):
+    selected_prompt = "What do users say about milk packet leakage?"
+if q_cols2.button("☕ Zepto Cafe", key="btn_cafe"):
+    selected_prompt = "How is Zepto Cafe performing in reviews?"
+
+user_query = st.sidebar.text_input("💬 Ask about reviews:", key="chat_input_text", value=selected_prompt or "")
+send_clicked = st.sidebar.button("Send Question", key="send_chat_btn")
+
+if send_clicked or selected_prompt:
+    query_to_process = selected_prompt or user_query
+    if query_to_process.strip():
+        st.session_state.chat_history.append({"role": "user", "content": query_to_process})
+        qa_result = ReviewQAEngine.generate_answer(query_to_process, df)
+        st.session_state.chat_history.append({"role": "assistant", "content": qa_result["answer"]})
+
+st.sidebar.markdown("---")
+chat_container = st.sidebar.container()
+with chat_container:
+    for msg in st.session_state.chat_history[-6:]:
+        if msg["role"] == "user":
+            st.markdown(f"**👤 You:** {msg['content']}")
+        else:
+            st.markdown(f"**🤖 AI:** {msg['content']}")
+
+st.sidebar.markdown("---")
 st.sidebar.markdown("### 🛠️ Data Controls")
 
 filtered_df = df if not df.empty else pd.DataFrame()
