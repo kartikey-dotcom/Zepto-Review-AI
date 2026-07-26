@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 from backend.review_qa_engine import ReviewQAEngine
 
-def test_search_relevant_reviews():
+def test_vector_search():
     data = [
         {"rating_stars": 1, "sanitized_text": "Charger stopped working on Zepto app", "primary_aspect": "Non-Core"},
         {"rating_stars": 5, "sanitized_text": "Milk delivered super fast in 8 mins", "primary_aspect": "Delivery"},
@@ -10,7 +10,7 @@ def test_search_relevant_reviews():
     ]
     df = pd.DataFrame(data)
 
-    matched = ReviewQAEngine.search_relevant_reviews("milk leak", df)
+    matched = ReviewQAEngine.vector_search("milk leak", df)
     assert not matched.empty
     assert len(matched) >= 1
 
@@ -25,7 +25,6 @@ def test_generate_answer_single_paragraph_format():
     ans_elec = ReviewQAEngine.generate_answer("Why do electronics fail?", df)
     ans_milk = ReviewQAEngine.generate_answer("What about milk leakage?", df)
 
-    # Must be non-empty string
     assert isinstance(ans_elec["answer"], str)
     assert len(ans_elec["answer"]) > 20
 
