@@ -144,23 +144,16 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Sidebar Filters & Controls
-st.sidebar.markdown("### 🛠️ Filters & Data Controls")
-rating_filter = st.sidebar.multiselect("Star Rating Filter", [1, 2, 3, 4, 5], default=[1, 2, 3, 4, 5])
-search_keyword = st.sidebar.text_input("Search Review Keywords", "")
+# Sidebar Data Controls
+st.sidebar.markdown("### 🛠️ Data Controls")
 
-if not df.empty and "rating_stars" in df.columns:
-    filtered_df = df[df['rating_stars'].isin(rating_filter)]
-    if search_keyword:
-        filtered_df = filtered_df[filtered_df['sanitized_text'].str.contains(search_keyword, case=False, na=False)]
-else:
-    filtered_df = pd.DataFrame()
+filtered_df = df if not df.empty else pd.DataFrame()
 
 # Download CSV in Sidebar
 if not filtered_df.empty:
     csv_bytes = filtered_df.to_csv(index=False).encode('utf-8')
     st.sidebar.download_button(
-        label="📥 Export Filtered Reviews CSV",
+        label="📥 Export Customer Reviews CSV",
         data=csv_bytes,
         file_name="zepto_category_reviews.csv",
         mime="text/csv"
