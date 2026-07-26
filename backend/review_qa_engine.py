@@ -158,13 +158,13 @@ class ReviewQAEngine:
     def generate_answer(cls, query: str, df: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
         """
         Generates a domain-guarded, customer-finding analytical answer (max 100 words).
-        Refuses out-of-scope non-customer questions.
+        Refuses out-of-scope non-customer questions with exact requested text.
         """
         # Guard check: Ensure question is related to customer reviews and shopping behavior
         if not cls.is_domain_relevant(query):
             return {
                 "query": query,
-                "answer": "I am the Zepto Review AI Assistant trained exclusively on 5,000 customer reviews. I can only answer questions related to Zepto customer shopping behavior, product quality, delivery, app experience, and refunds.",
+                "answer": "I can only answer questions related to Zepto customer shopping behavior, product quality, delivery, app experience, and refunds.",
                 "metric": "Out of Scope",
                 "quotes": []
             }

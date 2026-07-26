@@ -16,7 +16,7 @@ def test_out_of_scope_guardrail():
     df = pd.DataFrame()
     out_of_scope_res = ReviewQAEngine.generate_answer("What is the capital of France?", df)
     assert "Out of Scope" in out_of_scope_res["metric"]
-    assert "trained exclusively on 5,000 customer reviews" in out_of_scope_res["answer"]
+    assert out_of_scope_res["answer"] == "I can only answer questions related to Zepto customer shopping behavior, product quality, delivery, app experience, and refunds."
 
 def test_generate_answer_key_finding_format():
     data = [
