@@ -149,13 +149,8 @@ st.markdown("""
 st.sidebar.markdown("### 🤖 Customer Review AI Assistant")
 st.sidebar.caption("Ask any question about customer reviews, complaints, delivery, or category switching friction.")
 
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = [
-        {
-            "role": "assistant",
-            "content": "Hello! I am your Zepto Review Assistant. Ask me anything about customer feedback, top complaints, return friction, or delivery speed!"
-        }
-    ]
+if "active_qa" not in st.session_state:
+    st.session_state.active_qa = None
 
 # Quick suggestion chips
 st.sidebar.markdown("**Quick Sample Questions:**")
@@ -177,18 +172,18 @@ send_clicked = st.sidebar.button("Send Question", key="send_chat_btn")
 if send_clicked or selected_prompt:
     query_to_process = selected_prompt or user_query
     if query_to_process.strip():
-        st.session_state.chat_history.append({"role": "user", "content": query_to_process})
         qa_result = ReviewQAEngine.generate_answer(query_to_process, df)
-        st.session_state.chat_history.append({"role": "assistant", "content": qa_result["answer"]})
+        st.session_state.active_qa = {
+            "question": query_to_process,
+            "answer": qa_result["answer"]
+        }
 
 st.sidebar.markdown("---")
-chat_container = st.sidebar.container()
-with chat_container:
-    for msg in st.session_state.chat_history[-6:]:
-        if msg["role"] == "user":
-            st.markdown(f"**👤 You:** {msg['content']}")
-        else:
-            st.markdown(f"**🤖 AI:** {msg['content']}")
+if st.session_state.active_qa:
+    st.sidebar.markdown(f"**👤 Question:** {st.session_state.active_qa['question']}")
+    st.sidebar.markdown(f"**🤖 AI Answer:**\n\n{st.session_state.active_qa['answer']}")
+else:
+    st.sidebar.info("Select a sample question above or type your question to get instant AI review insights.")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 🛠️ Data Controls")
