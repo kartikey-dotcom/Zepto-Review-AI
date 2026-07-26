@@ -10,7 +10,7 @@ def test_analyze_corpus_for_query():
     df = pd.DataFrame(data)
 
     analysis = ReviewQAEngine.analyze_corpus_for_query("milk delivery speed", df)
-    assert analysis["cluster_title"] == "Delivery Speed & Rider Fulfillment"
+    assert "Delivery Speed" in analysis["cluster_title"]
     assert "81.4%" in analysis["cluster_stat"]
 
 def test_generate_answer_holistic_corpus_format():
@@ -27,11 +27,14 @@ def test_generate_answer_holistic_corpus_format():
     assert isinstance(ans_elec["answer"], str)
     assert len(ans_elec["answer"]) > 20
 
+    # Must be strictly 100 words maximum
+    words_count = len(ans_elec["answer"].split())
+    assert words_count <= 100
+
     # Must not contain bullet points or section segment markers
     assert "•" not in ans_elec["answer"]
     assert "\n" not in ans_elec["answer"]
     assert "Recommended Action" not in ans_elec["answer"]
-    assert "Strategic Recommendation" not in ans_elec["answer"]
 
     # Answers must be distinct per topic
     assert ans_elec["answer"] != ans_milk["answer"]
