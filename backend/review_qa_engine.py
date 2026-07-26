@@ -156,9 +156,10 @@ class ReviewQAEngine:
                     f"Sample Customer Review Quotes:\n{quotes_str}\n\n"
                     f"STRICT OUTPUT INSTRUCTIONS:\n"
                     f"1. Write EXACTLY ONE concise, unified paragraph specifically answering '{query}'.\n"
-                    f"2. DO NOT exceed 100 words maximum.\n"
-                    f"3. DO NOT use bullet points, numbered lists, section headers, or line breaks.\n"
-                    f"4. DO NOT offer solutions, fixes, or recommendations. Provide strictly analytical customer review insights grounded in the dataset."
+                    f"2. DO NOT exceed 100 words maximum under any circumstances.\n"
+                    f"3. DO NOT use repetitive boilerplate prefix phrases like 'Primary customer discussions fall under...'. Vary your phrasing naturally.\n"
+                    f"4. DO NOT use bullet points, numbered lists, section headers, or line breaks.\n"
+                    f"5. DO NOT offer solutions, fixes, or recommendations. Provide strictly analytical customer review insights grounded in the dataset."
                 )
                 response = model.generate_content(prompt)
                 if response and response.text:
@@ -185,15 +186,19 @@ class ReviewQAEngine:
     @classmethod
     def _synthesize_dynamic_answer(cls, query: str, count: int, avg_rating: float, top_aspect: str, quotes: List[str]) -> str:
         keywords = cls.extract_keywords(query)
-        kw_label = " ".join(keywords[:3]) if keywords else "this area"
+        topic_str = " ".join(keywords[:3]) if keywords else "this query"
+        quote_text = quotes[0] if quotes else ""
         
-        sentiment_desc = "strong customer dissatisfaction" if avg_rating <= 1.8 else (
-            "mixed customer sentiment" if avg_rating <= 3.5 else "predominantly positive feedback"
+        sentiment = "predominantly negative customer feedback" if avg_rating <= 1.8 else (
+            "mixed user reviews" if avg_rating <= 3.5 else "high customer satisfaction"
         )
-        
-        quote_snippet = f" as highlighted by customer feedback: {quotes[0]}" if quotes else "."
 
-        return (
-            f"Analysis of {count:,} customer reviews relating to '{kw_label}' reveals an average rating of {avg_rating:.2f}/5.0★ with {sentiment_desc}. "
-            f"Primary customer discussions fall under {top_aspect}{quote_snippet}"
-        )
+        if quote_text:
+            return (
+                f"Review data for '{topic_str}' ({count:,} discussions, {avg_rating:.2f}/5.0★ avg) shows {sentiment} focused on {top_aspect}. "
+                f"Customers note: {quote_text}."
+            )
+        else:
+            return (
+                f"Review analysis across {count:,} customer discussions regarding '{topic_str}' indicates an average rating of {avg_rating:.2f}/5.0★ with {sentiment} in {top_aspect}."
+            )
