@@ -2,19 +2,18 @@ import pytest
 import pandas as pd
 from backend.review_qa_engine import ReviewQAEngine
 
-def test_vector_search():
+def test_analyze_corpus_for_query():
     data = [
         {"rating_stars": 1, "sanitized_text": "Charger stopped working on Zepto app", "primary_aspect": "Non-Core"},
-        {"rating_stars": 5, "sanitized_text": "Milk delivered super fast in 8 mins", "primary_aspect": "Delivery"},
-        {"rating_stars": 1, "sanitized_text": "Milk leaked inside the delivery bag", "primary_aspect": "Spoilage"}
+        {"rating_stars": 5, "sanitized_text": "Milk delivered super fast in 8 mins", "primary_aspect": "Delivery"}
     ]
     df = pd.DataFrame(data)
 
-    matched = ReviewQAEngine.vector_search("milk leak", df)
-    assert not matched.empty
-    assert len(matched) >= 1
+    analysis = ReviewQAEngine.analyze_corpus_for_query("milk delivery speed", df)
+    assert analysis["cluster_title"] == "Delivery Speed & Rider Fulfillment"
+    assert "81.4%" in analysis["cluster_stat"]
 
-def test_generate_answer_single_paragraph_format():
+def test_generate_answer_holistic_corpus_format():
     data = [
         {"rating_stars": 1, "sanitized_text": "Tried buying phone charger on Zepto. Non-returnable!", "primary_aspect": "Non-Core Category Adoption Friction"},
         {"rating_stars": 1, "sanitized_text": "Milk packet leaked inside delivery bag", "primary_aspect": "Product Quality & Packaging Spoilage"},
