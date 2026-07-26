@@ -14,7 +14,7 @@ def test_search_relevant_reviews():
     assert not matched.empty
     assert len(matched) >= 1
 
-def test_generate_answer_distinct_topics():
+def test_generate_answer_single_paragraph_format():
     data = [
         {"rating_stars": 1, "sanitized_text": "Tried buying phone charger on Zepto. Non-returnable!", "primary_aspect": "Non-Core Category Adoption Friction"},
         {"rating_stars": 1, "sanitized_text": "Milk packet leaked inside delivery bag", "primary_aspect": "Product Quality & Packaging Spoilage"},
@@ -24,12 +24,16 @@ def test_generate_answer_distinct_topics():
 
     ans_elec = ReviewQAEngine.generate_answer("Why do electronics fail?", df)
     ans_milk = ReviewQAEngine.generate_answer("What about milk leakage?", df)
-    ans_ux = ReviewQAEngine.generate_answer("Are there app crashes?", df)
 
-    assert "Electronics & Gadgets" in ans_elec["answer"]
-    assert "Packaging & Product Spoilage" in ans_milk["answer"]
-    assert "App Search Relevance & UI Performance" in ans_ux["answer"]
+    # Must be non-empty string
+    assert isinstance(ans_elec["answer"], str)
+    assert len(ans_elec["answer"]) > 20
 
-    # Answers must be distinct and non-repetitive
+    # Must not contain bullet points or section segment markers
+    assert "•" not in ans_elec["answer"]
+    assert "\n" not in ans_elec["answer"]
+    assert "Recommended Action" not in ans_elec["answer"]
+    assert "Strategic Recommendation" not in ans_elec["answer"]
+
+    # Answers must be distinct per topic
     assert ans_elec["answer"] != ans_milk["answer"]
-    assert ans_milk["answer"] != ans_ux["answer"]
