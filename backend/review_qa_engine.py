@@ -22,9 +22,10 @@ class ReviewQAEngine:
     # Specific Customer Review & E-Commerce Domain Keywords
     DOMAIN_KEYWORDS = {
         "zepto", "review", "reviews", "customer", "customers", "user", "users", "delivery", "speed",
-        "rider", "milk", "curd", "leak", "leaked", "spoil", "spoiled", "packaging", "bag", "damage",
-        "damaged", "charger", "electronics", "gadget", "earphone", "non-core", "beauty", "cosmetics",
-        "pan", "grocery", "groceries", "order", "refund", "ticket", "surge", "coupon", "discount",
+        "rider", "riders", "deliver", "delivered", "delivering", "doorstep", "gate", "floor", "address",
+        "milk", "curd", "leak", "leaked", "spoil", "spoiled", "packaging", "bag", "damage", "damaged",
+        "charger", "electronics", "gadget", "earphone", "non-core", "beauty", "cosmetics", "pan",
+        "grocery", "groceries", "order", "orders", "refund", "ticket", "surge", "coupon", "discount",
         "price", "pricing", "money", "app", "search", "ui", "ux", "bug", "crash", "freeze", "product",
         "item", "category", "return", "replacement", "behavior", "habit", "frustration", "issue",
         "problem", "delay", "fee", "support", "quality", "freshness", "meat", "chicken", "veggie",
