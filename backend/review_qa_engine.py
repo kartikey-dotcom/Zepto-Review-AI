@@ -4,59 +4,23 @@ import logging
 from typing import Dict, Any, List, Optional
 import pandas as pd
 from backend.config import settings
+from backend.gemini_absa_engine import GeminiABSAEngine
 
 logger = logging.getLogger(__name__)
 
 class ReviewQAEngine:
     """
     Intelligent AI Q&A Engine for Zepto Customer Reviews.
-    Reads through the customer review corpus (5,000+ reviews), identifies relevant
-    customer feedback, extracts empirical metrics, and synthesizes single-paragraph
-    analytical responses without bullet points, segments, or solution recommendations.
+    Reads through the customer review corpus (5,000+ reviews), extracts matching reviews,
+    calculates empirical rating metrics & aspect breakdown, and synthesizes 100% dynamic,
+    highly accurate single-paragraph analytical answers grounded directly in real customer quotes.
     """
 
     STOPWORDS = {
         "what", "why", "how", "when", "where", "who", "does", "do", "are", "is", "the", "and", "about",
         "for", "with", "tell", "show", "give", "many", "much", "can", "you", "zepto", "app", "review",
-        "reviews", "customer", "customers", "user", "users", "there", "their", "have", "has", "had"
-    }
-
-    TOPIC_DICTIONARY = {
-        "electronics": {
-            "keywords": ["electronics", "charger", "gadget", "earphone", "headphone", "cable", "device", "appliance", "tech"],
-            "title": "Electronics & Gadgets",
-            "summary": "Analysis of {count} customer reviews regarding electronics reveals an average rating of {avg:.2f}★ with strong dissatisfaction. Customers frequently report receiving defective or non-working devices alongside frustration with strict non-returnable app policies, as highlighted by feedback such as: {quote}."
-        },
-        "spoilage": {
-            "keywords": ["leak", "leaked", "spoil", "spoiled", "curd", "milk", "torn", "damaged", "spill", "rotten", "packaging", "bag"],
-            "title": "Packaging & Spoilage",
-            "summary": "Across {count} customer reviews mentioning product packaging and spoilage, the average rating is {avg:.2f}★. Customers consistently complain that leaking liquid items like milk and curd damage dry groceries packed in the same delivery bag, with representative feedback stating: {quote}."
-        },
-        "delivery": {
-            "keywords": ["delivery", "speed", "rider", "late", "delay", "minute", "mins", "fast", "quick", "time", "doorstep", "location"],
-            "title": "Delivery & Speed",
-            "summary": "Based on {count} customer reviews covering delivery speed and performance, the average rating is {avg:.2f}★. While rapid 10-minute delivery is widely praised as Zepto's key strength for daily grocery replenishment, friction arises from rider behavior and weather-related delays, as reflected in customer feedback: {quote}."
-        },
-        "refunds": {
-            "keywords": ["refund", "ticket", "charge", "surge", "coupon", "discount", "money", "price", "scam", "support", "customer care", "fee"],
-            "title": "Pricing & Refunds",
-            "summary": "Analysis of {count} reviews regarding pricing and customer support shows an average rating of {avg:.2f}★. Primary complaints center around unexpected checkout surge charges and automated support tickets being closed without resolving customer refund requests, with users noting: {quote}."
-        },
-        "cafe": {
-            "keywords": ["cafe", "bakery", "coffee", "snack", "sandwich", "croissant", "tea", "food", "hot"],
-            "title": "Zepto Cafe",
-            "summary": "Customer feedback across {count} reviews discussing Zepto Cafe shows an average rating of {avg:.2f}★. While convenience seekers appreciate quick 10-minute delivery for hot beverages and bakery items, dissatisfaction stems from food items occasionally arriving lukewarm or squashed, as illustrated by: {quote}."
-        },
-        "ux": {
-            "keywords": ["search", "ui", "ux", "crash", "freeze", "bug", "otp", "login", "payment", "screen", "banner", "navigation"],
-            "title": "App UI & Search UX",
-            "summary": "Review analysis across {count} discussions on app UX and search functionality yields an average rating of {avg:.2f}★. Users report search relevance failures when looking for non-grocery products alongside occasional checkout freeze issues, as noted in review feedback: {quote}."
-        },
-        "quality": {
-            "keywords": ["quality", "fresh", "vegetable", "veggie", "fruit", "meat", "chicken", "fish", "expiry", "date", "freshness"],
-            "title": "Perishable Freshness",
-            "summary": "Examining {count} customer discussions around fresh produce and meat shows an average rating of {avg:.2f}★. Customers demand high freshness standards for daily perishables and express disappointment when receiving bruised vegetables or items close to expiry, as captured in customer reviews: {quote}."
-        }
+        "reviews", "customer", "customers", "user", "users", "there", "their", "have", "has", "had",
+        "please", "some", "more", "say", "saying", "said", "think", "people"
     }
 
     @classmethod
@@ -65,7 +29,7 @@ class ReviewQAEngine:
         return [w for w in words if len(w) > 2 and w not in cls.STOPWORDS]
 
     @classmethod
-    def search_relevant_reviews(cls, query: str, df: pd.DataFrame, max_results: int = 25) -> pd.DataFrame:
+    def search_relevant_reviews(cls, query: str, df: pd.DataFrame, max_results: int = 30) -> pd.DataFrame:
         """
         Searches the DataFrame for reviews matching keywords in the query.
         """
@@ -76,14 +40,11 @@ class ReviewQAEngine:
         if not keywords:
             return df.head(max_results)
 
+        # Match reviews containing all or any of the query keywords
         pattern = "|".join(keywords)
         matched = df[df["sanitized_text"].str.contains(pattern, case=False, na=False)]
 
         if matched.empty:
-            for kw in keywords:
-                m = df[df["sanitized_text"].str.contains(kw, case=False, na=False)]
-                if not m.empty:
-                    return m.head(max_results)
             return df.head(max_results)
 
         return matched.head(max_results)
@@ -91,9 +52,10 @@ class ReviewQAEngine:
     @classmethod
     def generate_answer(cls, query: str, df: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
         """
-        Generates a single-paragraph analytical response strictly based on customer reviews.
+        Generates an accurate, context-specific single-paragraph answer based strictly on customer reviews.
         """
         if df is None or df.empty:
+            # Fallback dummy dataset if none loaded
             df = pd.DataFrame([
                 {"rating_stars": 1, "sanitized_text": "Tried buying phone charger on Zepto. It stopped working next day and Zepto app says NON-RETURNABLE!", "primary_aspect": "Non-Core Category Adoption Friction"},
                 {"rating_stars": 1, "sanitized_text": "Milk packet leaked inside the delivery bag and spoiled my biscuit packet!", "primary_aspect": "Product Quality & Packaging Spoilage"},
@@ -104,27 +66,39 @@ class ReviewQAEngine:
                 {"rating_stars": 1, "sanitized_text": "Tomatoes were soft and bruised. Quality check before delivery is badly needed.", "primary_aspect": "Product Quality & Packaging Spoilage"}
             ])
 
-        matched_df = cls.search_relevant_reviews(query, df, max_results=30)
+        # Ensure rating column is present
+        if "rating_stars" not in df.columns and "rating" in df.columns:
+            df["rating_stars"] = df["rating"]
+
+        matched_df = cls.search_relevant_reviews(query, df, max_results=50)
         total_matched = len(matched_df)
         avg_rating = float(matched_df["rating_stars"].mean()) if total_matched > 0 and "rating_stars" in matched_df.columns else 0.0
 
-        aspect_summary = {}
-        if not matched_df.empty and "primary_aspect" in matched_df.columns:
-            aspect_counts = matched_df["primary_aspect"].value_counts().to_dict()
-            aspect_summary = {k: int(v) for k, v in aspect_counts.items()}
+        # Classify primary aspects for matched reviews if missing or generic
+        aspect_counts = {}
+        for _, row in matched_df.iterrows():
+            aspect = row.get("primary_aspect")
+            if not aspect or aspect == "Core Grocery & Perishables":
+                analysis = GeminiABSAEngine.classify_aspect_rule_based(
+                    str(row.get("sanitized_text", "")),
+                    int(row.get("rating_stars", 1))
+                )
+                aspect = analysis["primary_aspect"]
+            aspect_counts[aspect] = aspect_counts.get(aspect, 0) + 1
 
+        # Extract top 2 unique representative quotes
         quotes = []
-        if not matched_df.empty and "sanitized_text" in matched_df.columns:
-            seen_texts = set()
-            for _, row in matched_df.iterrows():
-                text = str(row["sanitized_text"]).strip()
-                if text and text not in seen_texts:
-                    seen_texts.add(text)
-                    rating_val = row.get("rating_stars", row.get("rating", 1))
-                    quotes.append(f"\"{text}\" ({rating_val}★)")
-                if len(quotes) >= 3:
-                    break
+        seen_texts = set()
+        for _, row in matched_df.iterrows():
+            text = str(row.get("sanitized_text", "")).strip()
+            if text and text not in seen_texts:
+                seen_texts.add(text)
+                rating_val = row.get("rating_stars", row.get("rating", 1))
+                quotes.append(f"\"{text}\" ({rating_val}★)")
+            if len(quotes) >= 2:
+                break
 
+        # Attempt Gemini LLM call if API key is configured
         answer_text = None
         if settings.GEMINI_API_KEY:
             try:
@@ -140,9 +114,9 @@ class ReviewQAEngine:
                     f"Average Rating for Topic: {avg_rating:.2f}/5.0\n"
                     f"Sample Customer Quotes:\n{context_str}\n\n"
                     f"STRICT FORMAT INSTRUCTIONS:\n"
-                    f"1. Write EXACTLY ONE short, cohesive paragraph summarizing the review analysis.\n"
+                    f"1. Write EXACTLY ONE short, cohesive paragraph summarizing the customer review findings.\n"
                     f"2. DO NOT use bullet points, numbered lists, segment headers, or line breaks.\n"
-                    f"3. Provide STRICTLY review data analysis (sentiment, customer complaints, quotes). DO NOT suggest solutions, fixes, or recommendations."
+                    f"3. Provide STRICTLY analytical review insights (ratings, customer sentiment, exact quote). DO NOT suggest solutions or fix recommendations."
                 )
                 response = model.generate_content(prompt)
                 if response and response.text:
@@ -150,40 +124,33 @@ class ReviewQAEngine:
                     clean_res = re.sub(r'\s+', ' ', clean_res)
                     answer_text = clean_res
             except Exception as e:
-                logger.warning(f"Gemini LLM QA generation failed: {e}. Falling back to single-paragraph synthesis.")
+                logger.warning(f"Gemini LLM QA generation failed: {e}. Falling back to dynamic synthesis.")
 
         if not answer_text:
-            answer_text = cls._synthesize_paragraph_answer(query, total_matched, avg_rating, aspect_summary, quotes)
+            answer_text = cls._synthesize_accurate_paragraph(query, total_matched, avg_rating, aspect_counts, quotes)
 
         return {
             "query": query,
             "answer": answer_text,
             "total_matched": total_matched,
             "avg_rating": round(avg_rating, 2),
-            "quotes": quotes[:3]
+            "quotes": quotes[:2]
         }
 
     @classmethod
-    def _synthesize_paragraph_answer(cls, query: str, count: int, avg_rating: float, aspects: Dict[str, int], quotes: List[str]) -> str:
-        query_lower = query.lower()
+    def _synthesize_accurate_paragraph(cls, query: str, count: int, avg_rating: float, aspects: Dict[str, int], quotes: List[str]) -> str:
         keywords = cls.extract_keywords(query)
-        top_quote = quotes[0] if quotes else '"Customer feedback highlighted delivery speed and product quality as key metrics."'
+        kw_str = ", ".join(keywords[:2]) if keywords else "this topic"
+        top_aspect = max(aspects, key=aspects.get) if aspects else "App Experience"
 
-        # Match against Topic Dictionary
-        matched_topic = None
-        for topic_key, topic_data in cls.TOPIC_DICTIONARY.items():
-            if any(kw in query_lower for kw in topic_data["keywords"]):
-                matched_topic = topic_data
-                break
+        sentiment_label = "strong customer dissatisfaction" if avg_rating <= 1.8 else (
+            "mixed customer feedback" if avg_rating <= 3.5 else "mostly positive customer sentiment"
+        )
 
-        if matched_topic:
-            return matched_topic["summary"].format(count=count, avg=avg_rating, quote=top_quote)
+        quote_text = f" as highlighted by customer feedback: {quotes[0]}." if quotes else "."
 
-        # Dynamic paragraph synthesis for general/custom queries
-        kw_str = ", ".join(keywords[:2]) if keywords else "general query"
-        sentiment_label = "predominantly negative" if avg_rating < 2.5 else ("mixed" if avg_rating < 3.8 else "mostly positive")
-        aspect_str = ", ".join(list(aspects.keys())[:2]) if aspects else "App Performance"
-
+        # Build dynamic, highly accurate single-paragraph analysis
         return (
-            f"Analysis of {count} customer reviews relating to '{kw_str}' indicates an average rating of {avg_rating:.2f}/5.0★ with {sentiment_label} sentiment, primarily focused around {aspect_str}. Representative customer feedback reflects direct user sentiment: {top_quote}."
+            f"Analysis of {count:,} customer reviews relating to '{kw_str}' reveals an average score of {avg_rating:.2f}/5.0★ with {sentiment_label}. "
+            f"Primary discussions focus on {top_aspect}{quote_text}"
         )
