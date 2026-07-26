@@ -12,17 +12,33 @@ class ReviewQAEngine:
     """
     Holistic Customer Behavioral Q&A Engine for Zepto Reviews AI.
     
-    Extracts Key Findings, Primary Dataset Metrics, and Representative Quotes
-    for any customer review question, formatted as a single analytical paragraph (max 100 words).
+    Domain-guarded: Only answers questions related to Zepto customer reviews,
+    shopping behavior, product quality, delivery, app experience, and refunds.
+    Formatted as a single analytical paragraph (max 100 words).
     """
 
     CORPUS_TOTAL_REVIEWS = 5000
+
+    # Specific Customer Review & E-Commerce Domain Keywords
+    DOMAIN_KEYWORDS = {
+        "zepto", "review", "reviews", "customer", "customers", "user", "users", "delivery", "speed",
+        "rider", "milk", "curd", "leak", "leaked", "spoil", "spoiled", "packaging", "bag", "damage",
+        "damaged", "charger", "electronics", "gadget", "earphone", "non-core", "beauty", "cosmetics",
+        "pan", "grocery", "groceries", "order", "refund", "ticket", "surge", "coupon", "discount",
+        "price", "pricing", "money", "app", "search", "ui", "ux", "bug", "crash", "freeze", "product",
+        "item", "category", "return", "replacement", "behavior", "habit", "frustration", "issue",
+        "problem", "delay", "fee", "support", "quality", "freshness", "meat", "chicken", "veggie",
+        "vegetable", "pantry", "discovery", "explore", "checkout", "payment", "cafe", "bakery",
+        "coffee", "snack", "sandwich", "croissant", "food", "perishables", "store", "buy", "buying",
+        "purchase", "reorder", "lock-in", "barrier", "habitual", "shopping", "friction", "unmet",
+        "hesitate", "prevent", "discover", "repeat"
+    }
 
     # 8 Core Strategic Question Findings Matrix
     BEHAVIORAL_FINDINGS = [
         {
             "id": "q1_repeat",
-            "keywords": ["repeat", "grocery", "daily", "perishables", "milk", "vegetables", "curd", "lock-in", "habit", "reorder"],
+            "keywords": ["repeat", "grocery", "daily", "perishables", "milk", "vegetables", "curd", "lock-in", "habit", "reorder", "buy"],
             "metric": "81.4% Core Reorder Rate",
             "key_finding": "High trust in 10-minute delivery speed for daily emergency replenishment (milk, bread, vegetables) with zero risk perception for low-cost perishables.",
             "quote": "\"Delivery was super fast 8 mins, milk and curd delivered fresh every morning.\" (5★)"
@@ -57,7 +73,7 @@ class ReviewQAEngine:
         },
         {
             "id": "q6_frustrations",
-            "keywords": ["leak", "spoil", "frustration", "leaked", "spill", "bag", "damaged", "surge", "refund", "ticket", "support", "fee"],
+            "keywords": ["leak", "spoil", "frustration", "leaked", "spill", "bag", "damaged", "surge", "refund", "ticket", "support", "fee", "issue", "problem"],
             "metric": "39.8% Packaging Spoilage & Ticket Delays",
             "key_finding": "Leaking milk and curd packets damaging dry groceries in the delivery bag, hidden surge fees at checkout, and delayed automated support ticket resolution.",
             "quote": "\"Milk packet leaked inside the delivery bag and spoiled my biscuit packet!\" (1★)"
@@ -79,15 +95,21 @@ class ReviewQAEngine:
     ]
 
     @classmethod
+    def is_domain_relevant(cls, query: str) -> bool:
+        """
+        Guards chatbot against answering out-of-scope non-customer review questions.
+        """
+        words = set(re.findall(r'\b\w+\b', query.lower()))
+        overlap = words.intersection(cls.DOMAIN_KEYWORDS)
+        return len(overlap) > 0
+
+    @classmethod
     def extract_keywords(cls, query: str) -> List[str]:
         words = re.findall(r'\b\w+\b', query.lower())
         return [w for w in words if len(w) > 2]
 
     @classmethod
     def truncate_to_word_limit(cls, text: str, max_words: int = 100) -> str:
-        """
-        Enforces a strict maximum of 100 words per response.
-        """
         words = text.split()
         if len(words) <= max_words:
             return text
@@ -98,9 +120,6 @@ class ReviewQAEngine:
 
     @classmethod
     def find_best_behavioral_finding(cls, query: str, df: pd.DataFrame) -> Dict[str, Any]:
-        """
-        Finds the matching Key Finding, Primary Metric, and Quote for the query.
-        """
         query_lower = query.lower()
         keywords = cls.extract_keywords(query)
 
@@ -116,9 +135,8 @@ class ReviewQAEngine:
                 best_finding = item
 
         if not best_finding or highest_score == 0:
-            best_finding = cls.BEHAVIORAL_FINDINGS[1]  # Default to Category Adoption Friction
+            best_finding = cls.BEHAVIORAL_FINDINGS[1]
 
-        # Extract dynamic quote from df if matching review exists
         matching_quote = best_finding["quote"]
         if not df.empty and "sanitized_text" in df.columns:
             pattern = "|".join(keywords) if keywords else "zepto"
@@ -139,8 +157,18 @@ class ReviewQAEngine:
     @classmethod
     def generate_answer(cls, query: str, df: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
         """
-        Generates a key-finding focused analytical single-paragraph answer (max 100 words).
+        Generates a domain-guarded, customer-finding analytical answer (max 100 words).
+        Refuses out-of-scope non-customer questions.
         """
+        # Guard check: Ensure question is related to customer reviews and shopping behavior
+        if not cls.is_domain_relevant(query):
+            return {
+                "query": query,
+                "answer": "I am the Zepto Review AI Assistant trained exclusively on 5,000 customer reviews. I can only answer questions related to Zepto customer shopping behavior, product quality, delivery, app experience, and refunds.",
+                "metric": "Out of Scope",
+                "quotes": []
+            }
+
         if df is None:
             df = pd.DataFrame()
 
@@ -176,7 +204,6 @@ class ReviewQAEngine:
         if not answer_text:
             answer_text = cls._synthesize_finding_paragraph(query, finding_data)
 
-        # Enforce strict 100-word limit
         final_answer = cls.truncate_to_word_limit(answer_text, max_words=100)
 
         return {

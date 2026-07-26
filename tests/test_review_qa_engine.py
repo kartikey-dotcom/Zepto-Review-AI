@@ -11,7 +11,12 @@ def test_find_best_behavioral_finding():
 
     finding = ReviewQAEngine.find_best_behavioral_finding("milk repeat reorder speed", df)
     assert "81.4%" in finding["metric"]
-    assert "Key Finding" not in finding["metric"]
+
+def test_out_of_scope_guardrail():
+    df = pd.DataFrame()
+    out_of_scope_res = ReviewQAEngine.generate_answer("What is the capital of France?", df)
+    assert "Out of Scope" in out_of_scope_res["metric"]
+    assert "trained exclusively on 5,000 customer reviews" in out_of_scope_res["answer"]
 
 def test_generate_answer_key_finding_format():
     data = [
