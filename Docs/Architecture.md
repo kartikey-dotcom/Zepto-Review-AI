@@ -14,7 +14,7 @@ Zepto Reviews AI is an enterprise-grade AI analytics and automated developer rep
 
 The system features:
 * **Zero-Trust PII Masking Engine**: Redacts customer phone numbers, emails, order IDs, and residential addresses (`[PHONE_REDACTED]`, `[EMAIL_REDACTED]`, `[ORDER_ID_REDACTED]`, `[ADDRESS_REDACTED]`).
-* **Phase 1 Data Normalizer**: Filters out short reviews ($< 8$ words), emojis, and non-Latin scripts, maintaining a clean 5,000-review corpus.
+* **Phase 1 Data Normalizer**: Filters out short reviews ($< 8$ words), emojis, and non-Latin scripts, maintaining a clean 11,500-item multi-source corpus.
 * **Google AI Studio Rate Limiter**: Enforces strict **60 RPM (Requests Per Minute)** and **100,000 TPM (Tokens Per Minute)** throughput controls with 10-review prompt batching (~600 reviews/min throughput).
 * **Phase 2 Aspect-Based Sentiment Analysis (ABSA)**: Classifies customer sentiment across 5 Play Store aspect categories.
 * **AI Developer Reply Generator**: Generates context-aware responses strictly constrained to **$\le 350$ characters** for the Google Play Developer Console.
@@ -27,16 +27,16 @@ The system features:
 C4Context
     title System Context Diagram — Zepto Reviews AI (Phase 2 ABSA & Reply Gen)
 
-    Person(customer, "Zepto App User", "Submits Play Store reviews.")
+    Person(customer, "Zepto App User / Reddit Community", "Submits Play Store/App Store reviews & Reddit posts.")
     Person(cx_agent, "Zepto CX / Product Lead", "Monitors BI dashboard & approves developer replies.")
 
     System_Boundary(zepto_ai, "Zepto Reviews AI System") {
-        System(ingestion_api, "Play Store Ingestion Connector", "Scrapes & normalizes Play Store reviews.")
+        System(ingestion_api, "Multi-Platform Ingestion Connector", "Scrapes & normalizes Play Store, App Store reviews & Reddit discussions.")
         System(pii_engine, "PII Sanitizer & Data Normalizer", "Redacts PII & enforces >= 8 words, 0 emojis rule.")
         System(rate_limiter, "Google AI Studio Rate Limiter", "Throttles calls to 60 RPM & 100K TPM.")
         System(absa_engine, "Gemini ABSA Engine", "5-Aspect sentiment classification (-1.0 to +1.0).")
         System(reply_gen, "AI Developer Reply Generator", "Generates <= 350 character Play Store responses.")
-        System(cache_db, "SQLite DB & Cache Manager", "Serves 5,000 normalized reviews & reviews_cache.json.")
+        System(cache_db, "SQLite DB & Cache Manager", "Serves 11,500 normalized reviews & reviews_cache.json.")
     }
 
     System_Ext(google_play, "Google Play Store API", "Source of reviews & target for developer replies.")

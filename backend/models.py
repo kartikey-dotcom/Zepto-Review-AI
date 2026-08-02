@@ -8,6 +8,7 @@ class IngestReviewRequest(BaseModel):
     rating: int = Field(..., ge=1, le=5, description="Star rating 1 to 5")
     review_text: str = Field(..., description="Raw text content of the review")
     app_version: Optional[str] = Field("v4.12.0", description="Zepto app version string")
+    platform: Optional[str] = Field("play_store", description="Source platform: play_store, app_store, or reddit")
     thumbs_up_count: Optional[int] = Field(0, description="Number of thumbs up on Play Store")
     review_timestamp: Optional[str] = Field(None, description="ISO format creation timestamp")
 
@@ -25,6 +26,7 @@ class ReviewResponse(BaseModel):
     raw_text: str
     sanitized_text: str
     app_version: Optional[str]
+    platform: str = "play_store"
     thumbs_up_count: int
     language_code: str
     pii_detected: bool = False

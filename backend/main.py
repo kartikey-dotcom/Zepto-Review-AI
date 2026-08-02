@@ -185,14 +185,14 @@ async def trigger_production_scheduler(db: AsyncSession = Depends(get_db)):
 
 @app.post("/api/v1/loadtest/run")
 async def run_load_benchmark_suite(db: AsyncSession = Depends(get_db)):
-    """Runs high-throughput load and stress benchmark suite over 5,000 Play Store reviews."""
+    """Runs high-throughput load and stress benchmark suite over 11,500 multi-platform reviews."""
     return await LoadPerformanceBenchmark.run_benchmark_suite(db)
 
 # --- Cache, Ingestion, ABSA, Anomaly Endpoints ---
 
 @app.get("/api/v1/cache/summary")
 async def get_cache_summary():
-    """Returns high-speed cached metrics summary for all 5,000 reviews."""
+    """Returns high-speed cached metrics summary for all 11,500 reviews & Reddit discussions."""
     return CacheManager.get_summary()
 
 @app.get("/api/v1/cache/reviews")

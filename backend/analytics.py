@@ -129,7 +129,7 @@ class BIAnalyticsEngine:
         return comparison
 
     @classmethod
-    async def export_reviews_csv(cls, db: AsyncSession, limit: int = 5000) -> str:
+    async def export_reviews_csv(cls, db: AsyncSession, limit: int = 11500) -> str:
         """Generates CSV string of ingested Play Store reviews for report download."""
         stmt = (
             select(PlayStoreReview)

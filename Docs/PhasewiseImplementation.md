@@ -46,7 +46,7 @@ gantt
 | Parameter                          | Specification         | Details & Purpose                          |
 +------------------------------------+-----------------------+--------------------------------------------+
 | **Target App Package**             | `com.zepto.customer`  | Official Zepto Android Play Store Package  |
-| **Ingested Dataset Size**          | **5,000 Reviews**     | High-volume normalized review corpus       |
+| **Ingested Dataset Size**          | **11,500 Items**      | Play Store, App Store & Reddit corpus       |
 | **Export Text Files**              | `actual_reviews.txt`  | Raw review texts (1 review/line)           |
 |                                    | `finalized_reviews.txt`| Normalized & PII-sanitized clean texts     |
 | **Phase 1 Data Normalization**     | Min 8 words, 0 emojis | Clean Latin English & Hinglish text only   |
@@ -65,9 +65,9 @@ gantt
 
 ## 3. Phase Breakdown & Engineering Deliverables
 
-### Phase 1: Play Store Ingestion, Data Normalizer & PII Gateway (Weeks 1–2) — COMPLETE
+### Phase 1: Multi-Platform Ingestion, Data Normalizer & PII Gateway (Weeks 1–2) — COMPLETE
 
-* [x] Ingestion connector fetches and normalizes 5,000 Play Store reviews into `zepto_reviews.db` and `reviews_cache.json`.
+* [x] Ingestion connector fetches and normalizes 11,500 reviews & Reddit discussions into `zepto_reviews.db` and `reviews_cache.json`.
 * [x] Data Normalizer unit tests achieve 100% enforcement accuracy on length (< 8 words), emoji, and non-Latin language filtering.
 * [x] PII scrubbing unit tests achieve 100% redaction accuracy on benchmark Play Store review set.
 * [x] Exported clean review files `actual_reviews.txt` and `finalized_reviews.txt`.

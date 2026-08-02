@@ -17,9 +17,9 @@ class ReviewQAEngine:
     Formatted as a single analytical paragraph (max 100 words).
     """
 
-    CORPUS_TOTAL_REVIEWS = 5000
+    CORPUS_TOTAL_REVIEWS = 11500
 
-    # Specific Customer Review & E-Commerce Domain Keywords
+    # Specific Customer Review, App Store & Reddit Discussion Domain Keywords
     DOMAIN_KEYWORDS = {
         "zepto", "review", "reviews", "customer", "customers", "user", "users", "delivery", "speed",
         "rider", "riders", "deliver", "delivered", "delivering", "doorstep", "gate", "floor", "address",
@@ -32,7 +32,8 @@ class ReviewQAEngine:
         "vegetable", "pantry", "discovery", "explore", "checkout", "payment", "cafe", "bakery",
         "coffee", "snack", "sandwich", "croissant", "food", "perishables", "store", "buy", "buying",
         "purchase", "reorder", "lock-in", "barrier", "habitual", "shopping", "friction", "unmet",
-        "hesitate", "prevent", "discover", "repeat"
+        "hesitate", "prevent", "discover", "repeat", "reddit", "appstore", "ios", "playstore",
+        "subreddit", "thread", "comment", "apple pay", "faceid", "platform"
     }
 
     # 8 Core Strategic Question Findings Matrix

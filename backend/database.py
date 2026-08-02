@@ -17,6 +17,7 @@ class PlayStoreReview(Base):
     raw_text = Column(Text, nullable=False)
     sanitized_text = Column(Text, nullable=False)
     app_version = Column(String(50), nullable=True, index=True)
+    platform = Column(String(50), default="play_store", index=True)
     thumbs_up_count = Column(Integer, default=0)
     language_code = Column(String(20), default="unknown")
     overall_sentiment = Column(Float, nullable=True)

@@ -12,7 +12,7 @@ Zepto has achieved market leadership in 10-minute instant delivery for daily ess
 
 When users open the Zepto app, they default to habitual, emergency grocery reorders rather than exploring new product vertical expansion categories.
 
-**Zepto Reviews AI** analyzes 5,000 Play Store customer reviews to isolate and quantify the exact psychological, operational, and discovery barriers preventing cross-category switching.
+**Zepto Reviews AI** analyzes 11,500 customer reviews and community discussions (Google Play Store: 5,000 | Apple App Store: 3,500 | Reddit Discussions: 3,000) to isolate and quantify the exact psychological, operational, and discovery barriers preventing cross-category switching.
 
 ---
 

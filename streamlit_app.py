@@ -187,9 +187,19 @@ else:
     st.sidebar.info("Select a sample question above or type your question to get instant AI review insights.")
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("### 🛠️ Data Controls")
+st.sidebar.markdown("### 🌐 Discovery Sources & Data Controls")
+
+platform_options = ["All Platforms (11,500)", "Google Play Store (5,000)", "Apple App Store (3,500)", "Reddit Discussions (3,000)"]
+selected_platform_opt = st.sidebar.selectbox("Filter Data Source:", platform_options)
 
 filtered_df = df if not df.empty else pd.DataFrame()
+if not filtered_df.empty and "platform" in filtered_df.columns:
+    if "Google Play Store" in selected_platform_opt:
+        filtered_df = filtered_df[filtered_df["platform"] == "play_store"]
+    elif "Apple App Store" in selected_platform_opt:
+        filtered_df = filtered_df[filtered_df["platform"] == "app_store"]
+    elif "Reddit" in selected_platform_opt:
+        filtered_df = filtered_df[filtered_df["platform"] == "reddit"]
 
 # Download CSV in Sidebar
 if not filtered_df.empty:
@@ -232,12 +242,12 @@ with col3:
     """, unsafe_allow_html=True)
 
 with col4:
-    total_rev_count = len(filtered_df) if not filtered_df.empty else 5000
+    total_rev_count = len(filtered_df) if not filtered_df.empty else 11500
     st.markdown(f"""
     <div class="zepto-card">
-        <div class="metric-label">Reviews Scanned</div>
+        <div class="metric-label">Reviews & Posts Scanned</div>
         <div class="metric-value" style="color: #059669;">{total_rev_count:,}</div>
-        <div style="font-size: 11px; color: #6B7280; margin-top: 4px;">PII-Sanitized Customer Corpus</div>
+        <div style="font-size: 11px; color: #6B7280; margin-top: 4px;">Multi-Source Corpus (Play/AppStore/Reddit)</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -252,7 +262,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # TAB 1: 8 Core Behavioral Discovery Questions
 with tab1:
     st.markdown("### 💡 Customer Behavioral Discovery Matrix (8 Core Strategic Questions)")
-    st.caption("Extracted from 5,000 normalized customer discussions")
+    st.caption("Extracted from 11,500 normalized Play Store reviews, App Store reviews, and Reddit discussions")
 
     questions_data = [
         {

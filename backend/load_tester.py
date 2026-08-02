@@ -24,7 +24,7 @@ class LoadPerformanceBenchmark:
     """
 
     @classmethod
-    async def run_benchmark_suite(cls, db: AsyncSession, sample_count: int = 5000) -> Dict[str, Any]:
+    async def run_benchmark_suite(cls, db: AsyncSession, sample_count: int = 11500) -> Dict[str, Any]:
         """Runs the full load and stress benchmark suite over database reviews."""
         logger.info(f"Starting Phase 5 Load Benchmark Suite over {sample_count} reviews...")
 
