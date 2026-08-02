@@ -18,6 +18,13 @@ def test_out_of_scope_guardrail():
     assert "Out of Scope" in out_of_scope_res["metric"]
     assert out_of_scope_res["answer"] == "I can only answer questions related to Zepto customer shopping behavior, product quality, delivery, app experience, and refunds."
 
+    # Test corporate / founder / off-topic trivia queries mentioning Zepto
+    founder_res = ReviewQAEngine.generate_answer("who is the founder of Zepto", df)
+    assert "Out of Scope" in founder_res["metric"]
+
+    ceo_res = ReviewQAEngine.generate_answer("what is the valuation of Zepto", df)
+    assert "Out of Scope" in ceo_res["metric"]
+
 def test_generate_answer_key_finding_format():
     data = [
         {"rating_stars": 1, "sanitized_text": "Tried buying phone charger on Zepto. Non-returnable!", "primary_aspect": "Non-Core Category Adoption Friction"},

@@ -19,9 +19,19 @@ class ReviewQAEngine:
 
     CORPUS_TOTAL_REVIEWS = 11500
 
+    # Explicit Off-Topic / Non-Review Keywords (Corporate trivia, leadership, general knowledge)
+    OFFTOPIC_KEYWORDS = {
+        "founder", "founders", "cofounder", "co-founder", "ceo", "cto", "cfo", "owner", "management",
+        "executive", "valuation", "funded", "funding", "investor", "investors", "revenue", "profit",
+        "stock", "shares", "ipo", "headquarters", "office", "salary", "salaries", "job", "jobs",
+        "hiring", "hire", "interview", "career", "careers", "employee", "employees", "code", "python",
+        "java", "script", "algorithm", "recipe", "capital", "president", "pm", "cricket", "match",
+        "movie", "song", "weather", "news", "politics", "born", "birth"
+    }
+
     # Specific Customer Review, App Store & Reddit Discussion Domain Keywords
     DOMAIN_KEYWORDS = {
-        "zepto", "review", "reviews", "customer", "customers", "user", "users", "delivery", "speed",
+        "review", "reviews", "customer", "customers", "user", "users", "delivery", "speed",
         "rider", "riders", "deliver", "delivered", "delivering", "doorstep", "gate", "floor", "address",
         "milk", "curd", "leak", "leaked", "spoil", "spoiled", "packaging", "bag", "damage", "damaged",
         "charger", "electronics", "gadget", "earphone", "non-core", "beauty", "cosmetics", "pan",
@@ -101,7 +111,19 @@ class ReviewQAEngine:
         """
         Guards chatbot against answering out-of-scope non-customer review questions.
         """
-        words = set(re.findall(r'\b\w+\b', query.lower()))
+        query_clean = query.lower().strip()
+        words = set(re.findall(r'\b\w+\b', query_clean))
+
+        # 1. Reject explicit off-topic terms (founders, corporate, careers, etc.)
+        if any(ot in words for ot in cls.OFFTOPIC_KEYWORDS):
+            return False
+
+        # 2. Reject questions asking "who is", "who founded", "when was", "where is", "net worth"
+        if re.search(r'\b(who is|who founded|who are|when was|where is|net worth)\b', query_clean):
+            if not any(w in words for w in ["review", "reviews", "rating", "complaint", "feedback"]):
+                return False
+
+        # 3. Must contain at least one specific customer review domain keyword
         overlap = words.intersection(cls.DOMAIN_KEYWORDS)
         return len(overlap) > 0
 
@@ -121,12 +143,12 @@ class ReviewQAEngine:
         return truncated
 
     @classmethod
-    def find_best_behavioral_finding(cls, query: str, df: pd.DataFrame) -> Dict[str, Any]:
+    def find_best_behavioral_finding(cls, query: str, df: pd.DataFrame) -> Optional[Dict[str, Any]]:
         query_lower = query.lower()
         keywords = cls.extract_keywords(query)
 
         best_finding = None
-        highest_score = -1
+        highest_score = 0
 
         for item in cls.BEHAVIORAL_FINDINGS:
             score = sum(1 for kw in keywords if kw in item["keywords"])
@@ -136,8 +158,8 @@ class ReviewQAEngine:
                 highest_score = score
                 best_finding = item
 
-        if not best_finding or highest_score == 0:
-            best_finding = cls.BEHAVIORAL_FINDINGS[1]
+        if not best_finding or highest_score <= 0:
+            return None
 
         matching_quote = best_finding["quote"]
         if not df.empty and "sanitized_text" in df.columns:
@@ -162,19 +184,23 @@ class ReviewQAEngine:
         Generates a domain-guarded, customer-finding analytical answer (max 100 words).
         Refuses out-of-scope non-customer questions with exact requested text.
         """
+        refusal_response = {
+            "query": query,
+            "answer": "I can only answer questions related to Zepto customer shopping behavior, product quality, delivery, app experience, and refunds.",
+            "metric": "Out of Scope",
+            "quotes": []
+        }
+
         # Guard check: Ensure question is related to customer reviews and shopping behavior
         if not cls.is_domain_relevant(query):
-            return {
-                "query": query,
-                "answer": "I can only answer questions related to Zepto customer shopping behavior, product quality, delivery, app experience, and refunds.",
-                "metric": "Out of Scope",
-                "quotes": []
-            }
+            return refusal_response
 
         if df is None:
             df = pd.DataFrame()
 
         finding_data = cls.find_best_behavioral_finding(query, df)
+        if not finding_data:
+            return refusal_response
 
         answer_text = None
         if settings.GEMINI_API_KEY:
