@@ -106,6 +106,14 @@ st.markdown("""
         font-size: 11px;
         font-weight: 600;
     }
+
+    /* Hide Streamlit Input Instructions ("Press Enter to submit form" / "Press Enter to apply") */
+    div[data-testid="InputInstructions"],
+    div[data-testid="stFormInstructions"],
+    small[data-testid="InputInstructions"],
+    .stTextInput small {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -168,7 +176,7 @@ if q_cols2.button("☕ Zepto Cafe", key="btn_cafe"):
     selected_prompt = "How is Zepto Cafe performing in reviews?"
 
 with st.sidebar.form(key="chat_qa_form", clear_on_submit=False):
-    user_query = st.text_input("💬 Ask about reviews:", key="chat_input_text", value=selected_prompt or "")
+    user_query = st.text_input("💬 Ask about reviews:", placeholder="Type your question here...", key="chat_input_text", value=selected_prompt or "")
     send_clicked = st.form_submit_button("Send Question")
 
 if send_clicked or selected_prompt:
