@@ -167,12 +167,13 @@ if q_cols1.button("🥛 Milk Leak", key="btn_milk"):
 if q_cols2.button("☕ Zepto Cafe", key="btn_cafe"):
     selected_prompt = "How is Zepto Cafe performing in reviews?"
 
-user_query = st.sidebar.text_input("💬 Ask about reviews:", key="chat_input_text", value=selected_prompt or "")
-send_clicked = st.sidebar.button("Send Question", key="send_chat_btn")
+with st.sidebar.form(key="chat_qa_form", clear_on_submit=False):
+    user_query = st.text_input("💬 Ask about reviews:", key="chat_input_text", value=selected_prompt or "")
+    send_clicked = st.form_submit_button("Send Question")
 
 if send_clicked or selected_prompt:
     query_to_process = selected_prompt or user_query
-    if query_to_process.strip():
+    if query_to_process and query_to_process.strip():
         qa_result = ReviewQAEngine.generate_answer(query_to_process, df)
         st.session_state.active_qa = {
             "question": query_to_process,
