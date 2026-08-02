@@ -52,3 +52,10 @@ def test_generate_answer_key_finding_format():
 
     # Answers must be distinct per topic
     assert ans_elec["answer"] != ans_milk["answer"]
+
+def test_buyer_segment_query():
+    df = pd.DataFrame()
+    res = ReviewQAEngine.generate_answer("any specific buyers who are buying similar kind of products", df)
+    assert res["metric"] != "Out of Scope"
+    assert "11.9%" in res["metric"] or "81.4%" in res["metric"]
+    assert "Key Finding" in res["answer"]

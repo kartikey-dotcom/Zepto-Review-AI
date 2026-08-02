@@ -31,7 +31,8 @@ class ReviewQAEngine:
 
     # Specific Customer Review, App Store & Reddit Discussion Domain Keywords
     DOMAIN_KEYWORDS = {
-        "review", "reviews", "customer", "customers", "user", "users", "delivery", "speed",
+        "review", "reviews", "customer", "customers", "user", "users", "buyer", "buyers", "segment", "segments",
+        "purchaser", "purchasers", "similar", "profile", "types", "type", "delivery", "speed",
         "rider", "riders", "deliver", "delivered", "delivering", "doorstep", "gate", "floor", "address",
         "milk", "curd", "leak", "leaked", "spoil", "spoiled", "packaging", "bag", "damage", "damaged",
         "charger", "electronics", "gadget", "earphone", "non-core", "beauty", "cosmetics", "pan",
@@ -50,7 +51,7 @@ class ReviewQAEngine:
     BEHAVIORAL_FINDINGS = [
         {
             "id": "q1_repeat",
-            "keywords": ["repeat", "grocery", "daily", "perishables", "milk", "vegetables", "curd", "lock-in", "habit", "reorder", "buy"],
+            "keywords": ["repeat", "grocery", "daily", "perishables", "milk", "vegetables", "curd", "lock-in", "habit", "reorder", "buy", "buying"],
             "metric": "81.4% Core Reorder Rate",
             "key_finding": "High trust in 10-minute delivery speed for daily emergency replenishment (milk, bread, vegetables) with zero risk perception for low-cost perishables.",
             "quote": "\"Delivery was super fast 8 mins, milk and curd delivered fresh every morning.\" (5★)"
@@ -92,7 +93,7 @@ class ReviewQAEngine:
         },
         {
             "id": "q7_cafe",
-            "keywords": ["cafe", "bakery", "coffee", "snack", "sandwich", "croissant", "impulse", "experiment", "foodie"],
+            "keywords": ["cafe", "bakery", "coffee", "snack", "sandwich", "croissant", "impulse", "experiment", "foodie", "buyer", "buyers", "segment", "segments", "similar", "purchaser", "purchasers"],
             "metric": "11.9% Cafe Impulse Adoption",
             "key_finding": "Convenience Seekers & Impulse Foodies buying Zepto Cafe snacks and bakery items represent the highest-converting segment for cross-category expansion.",
             "quote": "\"Ordered hot coffee and croissant from Zepto Cafe. Surprised by how fresh it arrived in 9 mins!\" (5★)"
@@ -118,9 +119,9 @@ class ReviewQAEngine:
         if any(ot in words for ot in cls.OFFTOPIC_KEYWORDS):
             return False
 
-        # 2. Reject questions asking "who is", "who founded", "when was", "where is", "net worth"
-        if re.search(r'\b(who is|who founded|who are|when was|where is|net worth)\b', query_clean):
-            if not any(w in words for w in ["review", "reviews", "rating", "complaint", "feedback"]):
+        # 2. Reject non-review question starts like "who is", "who founded", "when was", "where is", "net worth"
+        if re.search(r'^\s*(who is|who founded|when was|where is|net worth)\b', query_clean):
+            if not any(w in words for w in ["review", "reviews", "rating", "complaint", "feedback", "buyer", "buyers", "customer", "user"]):
                 return False
 
         # 3. Must contain at least one specific customer review domain keyword
